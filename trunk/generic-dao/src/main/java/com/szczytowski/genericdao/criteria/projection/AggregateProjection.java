@@ -1,22 +1,32 @@
 package com.szczytowski.genericdao.criteria.projection;
 
 import com.szczytowski.genericdao.criteria.Criteria;
-import com.szczytowski.genericdao.criteria.CriteriaQuery;
-import com.szczytowski.genericdao.exception.GenericDaoException;
 
+/**
+ * Aggregate projection.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class AggregateProjection extends SimpleProjection {
 
-	protected final String propertyName;
+    protected final String property;
 
-	private final String aggregate;
+    private final String aggregate;
 
-	protected AggregateProjection(String aggregate, String propertyName) {
-		this.aggregate = aggregate;
-		this.propertyName = propertyName;
-	}
+    /**
+     * Create new aggregate projection using given function and property.
+     * 
+     * @param aggregate aggregate function
+     * @param property aggregated property
+     */
+    protected AggregateProjection(String aggregate, String property) {
+        this.aggregate = aggregate;
+        this.property = property;
+    }
 
-	public String toSqlString(Criteria criteria, int loc, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		return aggregate + "(" + criteriaQuery.getPropertyName(propertyName, criteria) + ")";
-	}
-
+    @Override
+    public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        return aggregate + "(" + criteriaQuery.getPropertyName(property, criteria) + ")";
+    }
 }

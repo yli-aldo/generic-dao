@@ -1,15 +1,26 @@
 package com.szczytowski.genericdao.criteria.restriction;
 
-import com.szczytowski.genericdao.criteria.Criteria.Criterion;
+import com.szczytowski.genericdao.criteria.Criterion;
 
+/**
+ * Empty expression.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class EmptyExpression extends AbstractEmptinessExpression implements Criterion {
 
-	protected EmptyExpression(String propertyName) {
-		super( propertyName );
-	}
+    /**
+     * Create new empty expression.
+     *
+     * @param property property
+     */
+    protected EmptyExpression(String property) {
+        super(property);
+    }
 
-	protected boolean excludeEmpty() {
-		return false;
-	}
-
+    @Override
+    protected boolean excludeEmpty() {
+        return false;
+    }
 }

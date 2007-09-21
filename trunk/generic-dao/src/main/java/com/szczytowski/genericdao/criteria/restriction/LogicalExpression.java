@@ -1,25 +1,35 @@
 package com.szczytowski.genericdao.criteria.restriction;
 
-
 import com.szczytowski.genericdao.criteria.Criteria;
-import com.szczytowski.genericdao.criteria.CriteriaQuery;
-import com.szczytowski.genericdao.criteria.Criteria.Criterion;
-import com.szczytowski.genericdao.exception.GenericDaoException;
+import com.szczytowski.genericdao.criteria.Criterion;
 
+/**
+ * Logical expression.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class LogicalExpression implements Criterion {
 
-	private final Criterion lhs;
-	private final Criterion rhs;
-	private final String op;
+    private final Criterion lhs;
+    private final Criterion rhs;
+    private final String operator;
 
-	protected LogicalExpression(Criterion lhs, Criterion rhs, String op) {
-		this.lhs = lhs;
-		this.rhs = rhs;
-		this.op = op;
-	}
+    /**
+     * Create new logical expression.
+     *
+     * @param lhs left critetion
+     * @param rhs right criterion
+     * @param operator operator
+     */
+    protected LogicalExpression(Criterion lhs, Criterion rhs, String operator) {
+        this.lhs = lhs;
+        this.rhs = rhs;
+        this.operator = operator;
+    }
 
-	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		return "(" + lhs.toSqlString(criteria, criteriaQuery) + " " + op + " " + rhs.toSqlString(criteria, criteriaQuery) + ")";
-	}
-
+    @Override
+    public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        return "(" + lhs.toSqlString(criteria, criteriaQuery) + " " + operator + " " + rhs.toSqlString(criteria, criteriaQuery) + ")";
+    }
 }

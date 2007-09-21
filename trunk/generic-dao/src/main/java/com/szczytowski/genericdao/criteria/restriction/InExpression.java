@@ -1,29 +1,39 @@
 package com.szczytowski.genericdao.criteria.restriction;
 
 import com.szczytowski.genericdao.criteria.Criteria;
-import com.szczytowski.genericdao.criteria.CriteriaQuery;
-import com.szczytowski.genericdao.criteria.Criteria.Criterion;
-import com.szczytowski.genericdao.exception.GenericDaoException;
+import com.szczytowski.genericdao.criteria.Criterion;
 
+/**
+ * In expression.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class InExpression implements Criterion {
 
-	private final String propertyName;
-	private final Object[] values;
+    private final String property;
+    private final Object[] values;
 
-	protected InExpression(String propertyName, Object[] values) {
-		this.propertyName = propertyName;
-		this.values = values;
-	}
+    /**
+     * Create new in expression.
+     *
+     * @param property property
+     * @param values values
+     */
+    protected InExpression(String property, Object[] values) {
+        this.property = property;
+        this.values = values;
+    }
 
-	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		String sql = criteriaQuery.getPropertyName(propertyName, criteria) + " in (";
-		
-		for(Object v: values) {
-			criteriaQuery.setProperty(v);
-			sql += "?,";
-		}
-		
-		return sql.substring(0, sql.length()-1) + ")";
-	}
+    @Override
+    public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        String sql = criteriaQuery.getPropertyName(property, criteria) + " in (";
 
+        for (Object v : values) {
+            criteriaQuery.setParam(v);
+            sql += "?,";
+        }
+
+        return sql.substring(0, sql.length() - 1) + ")";
+    }
 }

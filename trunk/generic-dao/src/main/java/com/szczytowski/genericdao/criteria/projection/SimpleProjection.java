@@ -1,20 +1,28 @@
 package com.szczytowski.genericdao.criteria.projection;
 
 import com.szczytowski.genericdao.criteria.Criteria;
-import com.szczytowski.genericdao.criteria.CriteriaQuery;
-import com.szczytowski.genericdao.criteria.Criteria.Projection;
-import com.szczytowski.genericdao.exception.GenericDaoException;
+import com.szczytowski.genericdao.criteria.Projection;
 
+/**
+ * Abstract projection.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public abstract class SimpleProjection implements Projection {
 
-	protected boolean grouped;
-	
-	public String toGroupSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		throw new UnsupportedOperationException("not a grouping projection");
-	}
+    /**
+     * Group flag, true when this projection is grouping one.
+     */
+    protected boolean grouped;
 
-	public boolean isGrouped() {
-		return grouped;
-	}
+    @Override
+    public String toGroupSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        throw new UnsupportedOperationException("not a grouping projection");
+    }
 
+    @Override
+    public boolean isGrouped() {
+        return grouped;
+    }
 }

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.szczytowski.genericdao.test;
 
@@ -10,11 +10,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import com.szczytowski.genericdao.api.IEntity;
+import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 
 /**
  * {@link IEntity} implementation used in unit tests.
@@ -23,75 +25,124 @@ import com.szczytowski.genericdao.api.IEntity;
 @Table(name = "test_entity2")
 public class SimpleEntityImpl implements IEntity<Long> {
 
-	private static final long serialVersionUID = 6304928944916666344L;
+    private static final long serialVersionUID = 6304928944916666344L;
 
-	/**
-	 * Test property.
-	 */
-	public static final String P_PROP = "prop";
+    /**
+     * Test property.
+     */
+    public static final String P_PROP = "prop";
 
-	@Id
-	@SequenceGenerator(name = "gen_test_entity2_id", sequenceName = "test_entity2_id_seq", allocationSize = 10)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen_test_entity2_id")
-	private Long id;
+    /**
+     * Integer property.
+     */
+    public static final String P_INT = "number";
 
-	@Column(name = "prop", nullable = false, length = 64)
-	private String prop;
+    /**
+     * Entities set.
+     */
+    public static final String P_Entities = "entities";
 
-	/**
-	 * Constructor.
-	 */
-	public SimpleEntityImpl() {
-	}
+    @Id
+    @SequenceGenerator(name = "gen_test_entity2_id", sequenceName = "test_entity2_id_seq", allocationSize = 10)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen_test_entity2_id")
+    private Long id;
 
-	/**
-	 * Constructor.
-	 */
-	public SimpleEntityImpl(String prop) {
-		this.prop = prop;
-	}
+    @Column(name = "prop", nullable = true, length = 64)
+    private String prop;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(name = "number", nullable = true)
+    private Integer number;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @OneToMany(mappedBy = "entity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ComplexEntityImpl> entities;
 
-	/**
-	 * @return test property
-	 */
-	public String getProp() {
-		return prop;
-	}
+    /**
+     * Constructor.
+     */
+    public SimpleEntityImpl() {
+    }
 
-	/**
-	 * @param prop
-	 *            test property
-	 */
-	public void setProp(String prop) {
-		this.prop = prop;
-	}
+    /**
+     * Constructor.
+     * 
+     * @param prop test property
+     * @param number test number
+     */
+    public SimpleEntityImpl(String prop, Integer number) {
+        this.prop = prop;
+        this.number = number;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof SimpleEntityImpl == false) {
-			return false;
-		}
+    @Override
+    public Long getId() {
+        return id;
+    }
 
-		if (this == obj) {
-			return true;
-		}
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-		SimpleEntityImpl o = (SimpleEntityImpl) obj;
+    /**
+     * @return test property
+     */
+    public String getProp() {
+        return prop;
+    }
 
-		return new EqualsBuilder().append(prop, o.getProp()).isEquals();
-	}
+    /**
+     * @param prop test property
+     */
+    public void setProp(String prop) {
+        this.prop = prop;
+    }
 
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(prop).toHashCode();
-	}
 
+    /**
+     * @return test entities
+     */
+    public Set<ComplexEntityImpl> getEntities() {
+        return entities;
+    }
+
+    /**
+     * @param entities test entities
+     */
+    public void setEntities(Set<ComplexEntityImpl> entities) {
+        this.entities = entities;
+    }
+
+    /**
+     * @return test number
+     */
+    public Integer getNumber() {
+        return number;
+    }
+
+    /**
+     * @param number test number
+     */
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SimpleEntityImpl == false) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        SimpleEntityImpl o = (SimpleEntityImpl) obj;
+
+        return new EqualsBuilder().append(prop, o.getProp()).append(number, o.getNumber()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(prop).append(number).toHashCode();
+    }
 }
