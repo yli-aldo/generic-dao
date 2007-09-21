@@ -1,26 +1,36 @@
 package com.szczytowski.genericdao.criteria.restriction;
 
-
 import com.szczytowski.genericdao.criteria.Criteria;
-import com.szczytowski.genericdao.criteria.CriteriaQuery;
-import com.szczytowski.genericdao.criteria.Criteria.Criterion;
-import com.szczytowski.genericdao.exception.GenericDaoException;
+import com.szczytowski.genericdao.criteria.Criterion;
 
+/**
+ * Simple expression.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class SimpleExpression implements Criterion {
 
-	private final String propertyName;
-	private final Object value;
-	private final String op;
+    private final String property;
+    private final Object value;
+    private final String operator;
 
-	protected SimpleExpression(String propertyName, Object value, String op) {
-		this.propertyName = propertyName;
-		this.value = value;
-		this.op = op;
-	}
+    /**
+     * Create new simple expression.
+     *
+     * @param property property
+     * @param value value
+     * @param operator operator
+     */
+    protected SimpleExpression(String property, Object value, String operator) {
+        this.property = property;
+        this.value = value;
+        this.operator = operator;
+    }
 
-	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		criteriaQuery.setProperty(value);
-		return criteriaQuery.getPropertyName(propertyName, criteria) + op + "?";
-	}
-
+    @Override
+    public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        criteriaQuery.setParam(value);
+        return criteriaQuery.getPropertyName(property, criteria) + operator + "?";
+    }
 }

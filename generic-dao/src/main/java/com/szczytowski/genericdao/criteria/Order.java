@@ -1,33 +1,49 @@
 package com.szczytowski.genericdao.criteria;
 
-import com.szczytowski.genericdao.exception.GenericDaoException;
-
+/**
+ * Order used for manipulating order by clauses.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class Order {
 
-	private boolean ascending;
-	private String propertyName;
+    private boolean ascending;
+    private String property;
 
-	protected Order(String propertyName, boolean ascending) {
-		this.propertyName = propertyName;
-		this.ascending = ascending;
-	}
+    private Order(String property, boolean ascending) {
+        this.property = property;
+        this.ascending = ascending;
+    }
 
-	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		return propertyName + ( ascending ? " asc" : " desc" );
-	}
+    /**
+     * Generate part of EQL order by clause with given criteria.
+     *
+     * @param criteria criteria used in order
+     * @param criteriaQuery current query
+     * @return part of order by clause
+     */
+    public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        return criteriaQuery.getPropertyName(property, criteria) + (ascending ? " asc" : " desc");
+    }
 
-	/**
-	 * Ascending order
-	 */
-	public static Order asc(String propertyName) {
-		return new Order(propertyName, true);
-	}
+    /**
+     * Create new ascending order with given property.
+     *
+     * @param property property used in order
+     * @return new query object
+     */
+    public static Order asc(String property) {
+        return new Order(property, true);
+    }
 
-	/**
-	 * Descending order
-	 */
-	public static Order desc(String propertyName) {
-		return new Order(propertyName, false);
-	}
-
+    /**
+     * Create new descending order with given property.
+     *
+     * @param property property used in order
+     * @return new query object
+     */
+    public static Order desc(String property) {
+        return new Order(property, false);
+    }
 }

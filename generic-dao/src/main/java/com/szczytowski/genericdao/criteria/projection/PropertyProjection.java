@@ -1,32 +1,48 @@
 package com.szczytowski.genericdao.criteria.projection;
 
 import com.szczytowski.genericdao.criteria.Criteria;
-import com.szczytowski.genericdao.criteria.CriteriaQuery;
-import com.szczytowski.genericdao.exception.GenericDaoException;
 
+/**
+ * Property projection.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class PropertyProjection extends SimpleProjection {
 
-	private String propertyName;
+    private String propertyName;
 
-	protected PropertyProjection(String prop, boolean grouped) {
-		this.propertyName = prop;
-		this.grouped = grouped;
-	}
+    /**
+     * Create new property projection.
+     *
+     * @param property property
+     * @param grouped set projection as grouping one
+     */
+    protected PropertyProjection(String property, boolean grouped) {
+        this.propertyName = property;
+        this.grouped = grouped;
+    }
 
-	protected PropertyProjection(String prop) {
-		this(prop, false);
-	}
+    /**
+     * Create new property projection without grouping.
+     *
+     * @param property property
+     */
+    protected PropertyProjection(String property) {
+        this(property, false);
+    }
 
-	public String toSqlString(Criteria criteria, int position, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		return criteriaQuery.getPropertyName(propertyName, criteria);
-	}
+    @Override
+    public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        return criteriaQuery.getPropertyName(propertyName, criteria);
+    }
 
-	public String toGroupSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		if (!grouped) {
-			return super.toGroupSqlString(criteria, criteriaQuery);
-		} else {
-			return criteriaQuery.getPropertyName(propertyName, criteria);
-		}
-	}
-
+    @Override
+    public String toGroupSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        if (!grouped) {
+            return super.toGroupSqlString(criteria, criteriaQuery);
+        } else {
+            return criteriaQuery.getPropertyName(propertyName, criteria);
+        }
+    }
 }

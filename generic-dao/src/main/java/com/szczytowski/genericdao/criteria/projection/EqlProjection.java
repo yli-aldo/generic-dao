@@ -1,38 +1,53 @@
 package com.szczytowski.genericdao.criteria.projection;
 
 import com.szczytowski.genericdao.criteria.Criteria;
-import com.szczytowski.genericdao.criteria.CriteriaQuery;
-import com.szczytowski.genericdao.exception.GenericDaoException;
 
+/**
+ * EQL projection.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class EqlProjection extends SimpleProjection {
 
-	private String eql;
-	
-	private String groupEql;
+    private String eql;
 
-	protected EqlProjection(String eql, String groupEql) {
-		this.eql = eql;
-		this.groupEql = groupEql;
-		if(groupEql != null) {
-			this.grouped = true;
-		}
-		
-	}
+    private String groupEql;
 
-	protected EqlProjection(String eql) {
-		this(eql, null);
-	}
+    /**
+     * Create new EQL projection with select and group by clause.
+     *
+     * @param eql select clause
+     * @param groupEql group by clase
+     */
+    protected EqlProjection(String eql, String groupEql) {
+        this.eql = eql;
+        this.groupEql = groupEql;
+        if (groupEql != null) {
+            this.grouped = true;
+        }
+    }
 
-	public String toSqlString(Criteria criteria, int position, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		return eql;
-	}
+    /**
+     * Create new EQL projection with select clause.
+     *
+     * @param eql select clause
+     */
+    protected EqlProjection(String eql) {
+        this(eql, null);
+    }
 
-	public String toGroupSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		if (!grouped) {
-			return super.toGroupSqlString(criteria, criteriaQuery);
-		} else {
-			return groupEql;
-		}
-	}
+    @Override
+    public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        return eql;
+    }
 
+    @Override
+    public String toGroupSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        if (!grouped) {
+            return super.toGroupSqlString(criteria, criteriaQuery);
+        } else {
+            return groupEql;
+        }
+    }
 }

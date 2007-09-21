@@ -2,323 +2,487 @@ package com.szczytowski.genericdao.criteria;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-
 import com.szczytowski.genericdao.api.IEntity;
-import com.szczytowski.genericdao.exception.GenericDaoException;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 
+/**
+ * Critera used to build EQL queries.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class Criteria {
-
-	private String name;
-	
-	private Criteria parent;
-
-	private Projection projection;
-
-	private Criteria projectionCriteria;
-
-	private List<CriterionEntry> criterionList = new ArrayList<CriterionEntry>();
-
-	private List<OrderEntry> orderList = new ArrayList<OrderEntry>();
-
-	private List<Subcriteria> subcriteriaList = new ArrayList<Subcriteria>();
-
-	private Integer maxResults;
-
-	private Integer firstResult;
-	
-	/**
-	 * Create new criteria for specified <code>IEntity</code> implementation.
-	 * @see IEntity
-	 */
-	public static Criteria forClass(Class<? extends IEntity> entity) {
-		return new Criteria(getEntityName(entity));
-	}
-
-	private Criteria(String name) {
-		this(name, null);
-	}
-	
-	private Criteria(String name, Criteria parent) {
-		this.name = name;
-		this.parent = parent;
-	}
-	
-	/**
-	 * Get parent criteria. If this is not an instance of <code>Subcriteria</code> method will return null.
-	 */
-	public Criteria getParent() {
-		return parent;
-	}
-	
-	/**
-	 * Get criteria entity name. If this is an instance of <code>Criteria</code> (the root one) method will return null.
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Used to specify that the query results will be a projection (scalar in
-	 * nature). The individual components contained within the given
-	 * {@link Projection projection} determines the overall "shape" of the query
-	 * result.
-	 */
-	public Criteria setProjection(Projection projection) {
-		this.projection = projection;
-		this.projectionCriteria = this;
-		return this;
-	}
-
-	/**
-	 * Add a {@link Criterion restriction} to constrain the results to be
-	 * retrieved.
-	 */
-	public Criteria add(Criterion criterion) {
-		criterionList.add(new CriterionEntry(criterion, this));
-		return this;
-	}
-
-	/**
-	 * Add an {@link Order ordering} to the result set.
-	 */
-	public Criteria addOrder(Order order) {
-		orderList.add(new OrderEntry(order, this));
-		return this;
-	}
-
-	/**
-	 * Create a new <tt>Criteria</tt>, "rooted" at the associated entity.
-	 */
-	public Criteria createCriteria(String name) throws GenericDaoException {
-		return new Subcriteria(this, name);
-	}
-
-	/**
-	 * Set a limit upon the number of objects to be retrieved.
-	 */
-	public Criteria setMaxResults(int maxResults) {
-		this.maxResults = new Integer(maxResults);
-		return this;
-	}
-
-	/**
-	 * Set the first result to be retrieved.
-	 */
-	public Criteria setFirstResult(int firstResult) {
-		this.firstResult = new Integer(firstResult);
-		return this;
-	}
-
-	private Query prepareQuery(EntityManager entityManager)
-			throws GenericDaoException {
-
-		CriteriaQuery criteriaQuery = new CriteriaQuery();
-
-		String sql = "";
-
-		if (projection != null) {
-			String projectionSql = projection.toSqlString(projectionCriteria,
-					1, criteriaQuery);
-			if (projectionSql.length() > 0) {
-				sql += "select " + projectionSql + " ";
-			}
-		}
-
-		sql += "from " + name + " ";
-
-		String criterionSql = "";
-
-		for (CriterionEntry criterion : criterionList) {
-			if (criterionSql.length() > 0) {
-				criterionSql += " and ";
-			}
-			criterionSql += criterion.getCriterion().toSqlString(
-					criterion.getCriteria(), criteriaQuery);
-		}
-
-		if (criterionSql.length() > 0) {
-			sql += "where " + criterionSql + " ";
-		}
-
-		if (projection != null) {
-			String groupBySql = projection.toGroupSqlString(projectionCriteria,
-					criteriaQuery);
-			if (groupBySql.length() > 0) {
-				sql += "group by " + groupBySql + " ";
-			}
-		}
-
-		String orderSql = "";
-
-		for (OrderEntry order : orderList) {
-			if (orderSql.length() > 0) {
-				orderSql += ",";
-			}
-			orderSql += order.getOrder().toSqlString(order.getCriteria(),
-					criteriaQuery);
-		}
-
-		if (orderSql.length() > 0) {
-			sql += "order by " + orderSql + " ";
-		}
-
-		if (firstResult != null) {
-			sql += "offset " + firstResult + " ";
-		}
-
-		if (maxResults != null) {
-			sql += "limit " + maxResults + " ";
-		}
-
-		System.out.println("### " + sql + " ###");
-
-		Query query = entityManager.createQuery(sql);
-
-		int i = 1;
-
-		for (Object property : criteriaQuery.getProperties()) {
-			query.setParameter(i++, property);
-		}
-
-		return query;
-	}
-
-	/**
-	 * Get the results.
-	 */
-	public List list(EntityManager entityManager) throws GenericDaoException {
-		return prepareQuery(entityManager).getResultList();
-	}
-
-	/**
-	 * Convenience method to return a single instance that matches the query, or
-	 * null if the query returns no results.
-	 */
-	public Object uniqueResult(EntityManager entityManager)
-			throws GenericDaoException {
-		return prepareQuery(entityManager).getSingleResult();
-	}
-
-	protected static String getEntityName(Class<? extends IEntity> type) {
-		Entity entity = type.getAnnotation(Entity.class);
-
-		if (entity == null || entity.name() == null
-				|| entity.name().length() == 0) {
-			return type.getSimpleName();
-		} else {
-			return entity.name();
-		}
-	}
-
-	// Inner classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-	public final class Subcriteria extends Criteria {
-
-		private Subcriteria(Criteria parent, String name) {
-			super(name, parent);
-			Criteria.this.subcriteriaList.add(this);
-		}
-
-		public Criteria add(Criterion criterion) {
-			Criteria.this.criterionList
-					.add(new CriterionEntry(criterion, this));
-			return this;
-		}
-
-		public Criteria addOrder(Order order) {
-			Criteria.this.orderList.add(new OrderEntry(order, this));
-			return this;
-		}
-
-		public Criteria createCriteria(String name) throws GenericDaoException {
-			return new Subcriteria(Subcriteria.this, name);
-		}
-
-		public List list(EntityManager entityManager)
-				throws GenericDaoException {
-			return Criteria.this.list(entityManager);
-		}
-
-		public Object uniqueResult(EntityManager entityManager)
-				throws GenericDaoException {
-			return Criteria.this.uniqueResult(entityManager);
-		}
-
-		public Criteria setFirstResult(int firstResult) {
-			Criteria.this.setFirstResult(firstResult);
-			return this;
-		}
-
-		public Criteria setMaxResults(int maxResults) {
-			Criteria.this.setMaxResults(maxResults);
-			return this;
-		}
-
-		public Criteria setProjection(Projection projection) {
-			Criteria.this.projection = projection;
-			Criteria.this.projectionCriteria = this;
-			return this;
-		}
-	}
-
-	public static interface Projection {
-
-		public String toSqlString(Criteria criteria, int position,
-				CriteriaQuery criteriaQuery) throws GenericDaoException;
-
-		public String toGroupSqlString(Criteria criteria,
-				CriteriaQuery criteriaQuery) throws GenericDaoException;
-
-		public boolean isGrouped();
-
-	}
-
-	public static interface Criterion {
-
-		public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery)
-				throws GenericDaoException;
-
-	}
-
-	public static final class CriterionEntry {
-		private final Criterion criterion;
-
-		private final Criteria criteria;
-
-		private CriterionEntry(Criterion criterion, Criteria criteria) {
-			this.criteria = criteria;
-			this.criterion = criterion;
-		}
-
-		public Criterion getCriterion() {
-			return criterion;
-		}
-
-		public Criteria getCriteria() {
-			return criteria;
-		}
-	}
-
-	public static final class OrderEntry {
-		private final Order order;
-
-		private final Criteria criteria;
-
-		private OrderEntry(Order order, Criteria criteria) {
-			this.criteria = criteria;
-			this.order = order;
-		}
-
-		public Order getOrder() {
-			return order;
-		}
-
-		public Criteria getCriteria() {
-			return criteria;
-		}
-	}
+    
+    public enum JoinType {
+        
+        INNER_JOIN("inner join"), LEFT_JOIN("left outer join");
+        
+        private String sql;
+        
+        private JoinType(String sql) {
+            this.sql = sql;
+        }
+        
+        public String toSqlString() {
+            return sql;
+        }
+    }
+    
+    private int aliasNumber;
+    
+    private String name;
+    
+    private String alias;       
+    
+    private Criteria parent;
+    
+    private JoinType joinType;
+    
+    private Projection projection;
+    
+    private Criteria projectionCriteria;
+    
+    private List<CriterionEntry> criterionList = new ArrayList<CriterionEntry>();
+    
+    private List<OrderEntry> orderList = new ArrayList<OrderEntry>();
+    
+    private List<Subcriteria> subcriteriaList = new ArrayList<Subcriteria>();
+    
+    private Integer maxResults;
+    
+    private Integer firstResult;
+    
+    /**
+     * Create new criteria for specified <code>IEntity</code> implementation.
+     * @see IEntity
+     */
+    public static Criteria forClass(Class<? extends IEntity> entity) {
+        return new Criteria(getEntityName(entity), "this", null, null);
+    }
+    
+    private Criteria(String name, String alias, JoinType joinType, Criteria parent) {
+        this.name = name;
+        this.alias = alias;        
+        this.parent = parent;
+        this.joinType = joinType;
+    }
+    
+    /**
+     * Get name.
+     *
+     * @return name
+     */
+    protected String getName() {
+        return name;
+    }
+    
+    /**
+     * Get parent criteria. If this is not an instance of <code>Subcriteria</code> method will return null.
+     *
+     * @return parent name
+     */
+    protected Criteria getParent() {
+        return parent;
+    }
+    
+    /**
+     * Get criteria alias.
+     *
+     * @return alias
+     */
+    protected String getAlias() {
+        return alias;
+    }
+    
+    /**
+     * Get join type.
+     *
+     * @return join type
+     */
+    protected JoinType getJoinType() {
+        return joinType;
+    }
+    
+    /**
+     * Specify that the query results will be a projection. The individual components contained within the given
+     * <code>Projection</code> determines the overall "shape" of the query result.
+     *
+     * @param projection projection used in query
+     * @return criteria object
+     * @see Projection
+     * @see Projections
+     */
+    public Criteria setProjection(Projection projection) {
+        this.projection = projection;
+        this.projectionCriteria = this;
+        return this;
+    }
+    
+    /**
+     * Add a <code>Criterion</code> to constrain the results to be retrieved.
+     *
+     * @param criterion new restriction
+     * @return criteria object
+     */
+    public Criteria add(Criterion criterion) {
+        criterionList.add(new CriterionEntry(criterion, this));
+        return this;
+    }
+    
+    /**
+     * Add an <code>Order</code> to the result set.
+     *
+     * @param order new ordering
+     * @return criteria object
+     */
+    public Criteria addOrder(Order order) {
+        orderList.add(new OrderEntry(order, this));
+        return this;
+    }
+    
+    /**
+     * Create a new <code>Criteria</code> joined using "inner join".
+     *
+     * @param name criteria entity name
+     * @return subcriteria
+     */
+    public Criteria createCriteria(String name) {
+        return new Subcriteria(name, createAlias(name), JoinType.INNER_JOIN, this);
+    }
+    
+    /**
+     * Create a new <code>Criteria</code>.
+     *
+     * @param name criteria entity name
+     * @param joinType join type
+     * @return subcriteria
+     */
+    public Criteria createCriteria(String name, JoinType joinType) {
+        return new Subcriteria(name, createAlias(name), joinType, this);
+    }
+    
+    /**
+     * Create a new alias joined using "inner join".
+     *
+     * @param name criteria entity name
+     * @param alias alias
+     * @return criteria
+     */
+    public Criteria createAlias(String name, String alias) {
+        new Subcriteria(name, alias, JoinType.INNER_JOIN, this);
+        return this;
+    }
+    
+    /**
+     * Create a new alias.
+     *
+     * @param name criteria entity name
+     * @param alias alias
+     * @param joinType join type
+     * @return criteria
+     */
+    public Criteria createAlias(String name, String alias, JoinType joinType) {
+        new Subcriteria(name, alias, joinType, this);
+        return this;
+    }
+    
+    /**
+     * Set a limit upon the number of objects to be retrieved.
+     *
+     * @param maxResults number of objects to be retrieved
+     * @return criteria object
+     */
+    public Criteria setMaxResults(int maxResults) {
+        this.maxResults = new Integer(maxResults);
+        return this;
+    }
+    
+    /**
+     * Set the first result to be retrieved.
+     *
+     * @param firstResult first result to be retrieved
+     * @return criteria object
+     */
+    public Criteria setFirstResult(int firstResult) {
+        this.firstResult = new Integer(firstResult);
+        return this;
+    }
+    
+    /**
+     * Get the results.
+     *
+     * @param entityManager entity manager
+     * @return list of retrieved objects
+     */
+    public List list(EntityManager entityManager) {
+        return prepareQuery(entityManager).getResultList();
+    }
+    
+    /**
+     * Convenience method to return a single instance that matches the query.
+     *
+     * @param entityManager entity manager
+     * @return retrieved object
+     * @throws NoResultException - if there is no result
+     * @throws NonUniqueResultException - if more than one result
+     */
+    public Object uniqueResult(EntityManager entityManager) throws NonUniqueResultException, NoResultException {
+        return prepareQuery(entityManager).getSingleResult();
+    }
+    
+    @Override
+    public String toString() {
+        CriteriaQuery criteriaQuery = new CriteriaQuery();
+        
+        String result = prepateEql(criteriaQuery);
+        
+        if (criteriaQuery.getParams().size() > 0) {
+            result += " [" + criteriaQuery.getParams() + "]";
+        }
+        
+        return result;
+    }
+    
+    protected String createAlias(String name) {
+        return name + "_" + aliasNumber++;
+    }
+    
+    private String prepateEql(CriteriaQuery criteriaQuery) {
+        String sql = "from " + name + " as " + alias + " ";
+        criteriaQuery.registerAlias(alias);
+        
+        for(Criteria subcriteria: subcriteriaList) {
+            sql += subcriteria.getJoinType().toSqlString() + " ";
+            sql += criteriaQuery.getPropertyName(subcriteria.getName(), subcriteria.getParent());
+            sql += " as " + subcriteria.getAlias() + " ";
+            criteriaQuery.registerAlias(subcriteria.getAlias());
+        }
+        
+        if (projection != null) {
+            String projectionSql = projection.toSqlString(projectionCriteria, criteriaQuery);
+            if (projectionSql.length() > 0) {
+                sql = "select " + projectionSql + " " + sql;
+            } else {
+                sql = "select this " + sql;
+            }
+        } else {
+            sql = "select this " + sql;
+        }
+        
+        String criterionSql = "";
+        
+        for (CriterionEntry criterion : criterionList) {
+            if (criterionSql.length() > 0) {
+                criterionSql += " and ";
+            }
+            criterionSql += criterion.getCriterion().toSqlString(criterion.getCriteria(), criteriaQuery);
+        }
+        
+        if (criterionSql.length() > 0) {
+            sql += "where " + criterionSql + " ";
+        }
+        
+        if (projection != null) {
+            if (projection.isGrouped()) {
+                String groupBySql = projection.toGroupSqlString(projectionCriteria, criteriaQuery);
+                if (groupBySql.length() > 0) {
+                    sql += "group by " + groupBySql + " ";
+                }
+            }
+        }
+        
+        String orderSql = "";
+        
+        for (OrderEntry order : orderList) {
+            if (orderSql.length() > 0) {
+                orderSql += ",";
+            }
+            orderSql += order.getOrder().toSqlString(order.getCriteria(), criteriaQuery);
+        }
+        
+        if (orderSql.length() > 1) {
+            sql += "order by " + orderSql + " ";
+        }
+        
+        System.out.println("### " + sql);
+        
+        return sql.trim();
+    }
+    
+    private Query prepareQuery(EntityManager entityManager) {
+        CriteriaQuery criteriaQuery = new CriteriaQuery();
+        
+        String sql = prepateEql(criteriaQuery);
+        
+        Query query = entityManager.createQuery(sql);
+        
+        if (firstResult != null) {
+            query.setFirstResult(firstResult);
+        }
+        
+        if (maxResults != null) {
+            query.setMaxResults(maxResults);
+        }
+        
+        int i = 1;
+        
+        for (Object property : criteriaQuery.getParams()) {
+            query.setParameter(i++, property);
+        }
+        
+        return query;
+    }
+    
+    private static String getEntityName(Class<? extends IEntity> type) {
+        Entity entity = type.getAnnotation(Entity.class);
+        
+        if (entity == null || entity.name() == null || entity.name().length() == 0) {
+            return type.getSimpleName();
+        } else {
+            return entity.name();
+        }
+    }
+    
+    /**
+     * Information about current query, for example parameters.
+     */
+    public class CriteriaQuery {
+        
+        private List<Object> params = new ArrayList<Object>();
+        
+        private Set<String> aliases = new HashSet<String>();
+        
+        private CriteriaQuery() {
+        }
+        
+        /**
+         * Get name of property in given criteria context.
+         *
+         * @param name property's name
+         * @param criteria criteria
+         * @return proper name which can be used in EQL
+         */
+        public String getPropertyName(String name, Criteria criteria) {            
+            int pos = name.indexOf(".");
+            
+            if(pos == -1) {
+                return criteria.getAlias() + "." + name;
+            } else {              
+                if(aliases.contains(name.substring(0, pos))) {
+                    return name;
+                } else {
+                    return criteria.getAlias() + "." + name;
+                }
+            }
+            
+            
+        }
+        
+        /**
+         * Set query's param.
+         *
+         * @param param param value
+         */
+        public void setParam(Object param) {
+            params.add(param);
+        }
+        
+        /**
+         * Register alias.
+         *
+         * @param alias alias
+         */
+        private void registerAlias(String alias) {
+            this.aliases.add(alias);
+        }
+        
+        /**
+         * Get all query's params.
+         *
+         * @return list of query's params
+         */
+        private List<Object> getParams() {
+            return params;
+        }
+    }
+    
+    /**
+     * Subcritera associated with root criteria.
+     */
+    public class Subcriteria extends Criteria {
+        
+        private Subcriteria(String name, String alias, JoinType joinType, Criteria parent) {
+            super(name, alias, joinType, parent);
+            Criteria.this.subcriteriaList.add(this);
+        }
+        
+        @Override
+        public Criteria add(Criterion criterion) {
+            Criteria.this.criterionList.add(new CriterionEntry(criterion, this));
+            return Subcriteria.this;
+        }
+        
+        @Override
+        public Criteria addOrder(Order order) {
+            Criteria.this.orderList.add(new OrderEntry(order, this));
+            return Subcriteria.this;
+        }
+        
+        @Override
+        public Criteria createCriteria(String name) {
+            return new Subcriteria(name, Subcriteria.this.createAlias(name), JoinType.INNER_JOIN, Subcriteria.this);
+        }
+        
+        @Override
+        public Criteria createCriteria(String name, JoinType joinType) {
+            return new Subcriteria(name, Subcriteria.this.createAlias(name), joinType, Subcriteria.this);
+        }
+        
+        @Override
+        public Criteria createAlias(String name, String alias) {
+            new Subcriteria(name, alias, JoinType.INNER_JOIN, Subcriteria.this);
+            return Subcriteria.this;
+        }
+        
+        @Override
+        public Criteria createAlias(String name, String alias, JoinType joinType) {
+            new Subcriteria(name, alias, joinType, Subcriteria.this);
+            return Subcriteria.this;
+        }
+        
+        @Override
+        public List list(EntityManager entityManager) {
+            return Criteria.this.list(entityManager);
+        }
+        
+        @Override
+        public Object uniqueResult(EntityManager entityManager) throws NonUniqueResultException, NoResultException {
+            return Criteria.this.uniqueResult(entityManager);
+        }
+        
+        @Override
+        public Criteria setFirstResult(int firstResult) {
+            Criteria.this.setFirstResult(firstResult);
+            return Subcriteria.this;
+        }
+        
+        @Override
+        public Criteria setMaxResults(int maxResults) {
+            Criteria.this.setMaxResults(maxResults);
+            return Subcriteria.this;
+        }
+        
+        @Override
+        public Criteria setProjection(Projection projection) {
+            Criteria.this.projection = projection;
+            Criteria.this.projectionCriteria = this;
+            return Subcriteria.this;
+        }
+    }
 }

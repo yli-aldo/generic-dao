@@ -3,31 +3,31 @@ package com.szczytowski.genericdao.api;
 import java.io.Serializable;
 
 /**
- * Interface marks class which is an entity.
- * 
- * @param <I>
- *            type of entity primary key, it must be serializable
+ * Interface marks class which can be persisted.
+ *
+ * @param <I> type of primary key, it must be serializable
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
  */
 public interface IEntity<I extends Serializable> extends Serializable {
 
-	/**
-	 * Property which represents id.
-	 */
-	String P_ID = "id";
+    /**
+     * Property which represents id.
+     */
+    String P_ID = "id";
 
-	/**
-	 * Get entity's primary key.
-	 * 
-	 * @return entity's pk
-	 */
-	I getId();
+    /**
+     * Get primary key.
+     *
+     * @return primary key
+     */
+    I getId();
 
-	/**
-	 * Set entity's primary key.
-	 * 
-	 * @param id
-	 *            entity's pk
-	 */
-	void setId(I id);
-
+    /**
+     * Set primary key.
+     *
+     * @param id primary key
+     */
+    void setId(I id);
 }

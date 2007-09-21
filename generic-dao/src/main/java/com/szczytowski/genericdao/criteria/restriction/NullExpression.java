@@ -1,20 +1,29 @@
 package com.szczytowski.genericdao.criteria.restriction;
 
 import com.szczytowski.genericdao.criteria.Criteria;
-import com.szczytowski.genericdao.criteria.CriteriaQuery;
-import com.szczytowski.genericdao.criteria.Criteria.Criterion;
-import com.szczytowski.genericdao.exception.GenericDaoException;
+import com.szczytowski.genericdao.criteria.Criterion;
 
+/**
+ * Null expression.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class NullExpression implements Criterion {
 
-	private final String propertyName;
+    private final String property;
 
-	protected NullExpression(String propertyName) {
-		this.propertyName = propertyName;
-	}
+    /**
+     * Create new null expression.
+     *
+     * @param property property
+     */
+    protected NullExpression(String property) {
+        this.property = property;
+    }
 
-	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		return criteriaQuery.getPropertyName(propertyName, criteria) + " is null";
-	}
-
+    @Override
+    public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        return criteriaQuery.getPropertyName(property, criteria) + " is null";
+    }
 }

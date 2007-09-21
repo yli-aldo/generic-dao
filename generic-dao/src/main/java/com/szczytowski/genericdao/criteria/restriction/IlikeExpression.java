@@ -1,23 +1,33 @@
 package com.szczytowski.genericdao.criteria.restriction;
 
 import com.szczytowski.genericdao.criteria.Criteria;
-import com.szczytowski.genericdao.criteria.CriteriaQuery;
-import com.szczytowski.genericdao.criteria.Criteria.Criterion;
-import com.szczytowski.genericdao.exception.GenericDaoException;
+import com.szczytowski.genericdao.criteria.Criterion;
 
+/**
+ * ILike expression.
+ *
+ * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @since 1.0
+ */
 public class IlikeExpression implements Criterion {
 
-	private final String propertyName;
-	private final Object value;
+    private final String property;
+    private final Object value;
 
-	protected IlikeExpression(String propertyName, Object value) {
-		this.propertyName = propertyName;
-		this.value = value;
-	}
+    /**
+     * Create new ilike expression.
+     *
+     * @param property property
+     * @param value value
+     */
+    protected IlikeExpression(String property, Object value) {
+        this.property = property;
+        this.value = value;
+    }
 
-	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws GenericDaoException {
-		criteriaQuery.setProperty(value);
-		return criteriaQuery.getPropertyName(propertyName, criteria) + " ilike ?";
-	}
-
+    @Override
+    public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
+        criteriaQuery.setParam(value);
+        return criteriaQuery.getPropertyName(property, criteria) + " ilike ?";
+    }
 }
