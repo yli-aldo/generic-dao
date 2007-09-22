@@ -31,20 +31,10 @@ public class LikeExpression implements Criterion {
         this.ignoreCase = ignoreCase;
     }
 
-    /**
-     * Create new like expression.
-     *
-     * @param property property
-     * @param value value
-     */
-    protected LikeExpression(String property, Object value) {
-        this(property, value, null, false);
-    }
-
     @Override
     public String toSqlString(Criteria criteria, Criteria.CriteriaQuery criteriaQuery) {
-        criteriaQuery.setParam(value);
-        String lhs = ignoreCase ? "lowercase(" + criteriaQuery.getPropertyName(property, criteria) + ")" : criteriaQuery.getPropertyName(property, criteria);
+        criteriaQuery.setParam(ignoreCase ? value.toString().toLowerCase() : value);
+        String lhs = ignoreCase ? "lower(" + criteriaQuery.getPropertyName(property, criteria) + ")" : criteriaQuery.getPropertyName(property, criteria);
         return lhs + " like ?" + (escapeChar == null ? "" : " escape \'" + escapeChar + "\'");
     }
 }

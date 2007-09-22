@@ -40,7 +40,7 @@ public class SimpleEntityImpl implements IEntity<Long> {
     /**
      * Entities set.
      */
-    public static final String P_Entities = "entities";
+    public static final String P_ENTITIES = "entities";
 
     @Id
     @SequenceGenerator(name = "gen_test_entity2_id", sequenceName = "test_entity2_id_seq", allocationSize = 10)
