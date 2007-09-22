@@ -3,7 +3,7 @@ package com.szczytowski.genericdao.api;
 /**
  * Interface marks class which can be enabled or disabled.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public interface IActivable {

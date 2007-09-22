@@ -4,7 +4,7 @@ package com.szczytowski.genericdao.api;
  * Interface marks class which have default flag. DAO will check if there is only
  * one default object using <code>getExample()</code> method.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public interface IDefaultable {

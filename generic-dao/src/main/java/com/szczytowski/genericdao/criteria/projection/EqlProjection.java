@@ -5,7 +5,7 @@ import com.szczytowski.genericdao.criteria.Criteria;
 /**
  * EQL projection.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public class EqlProjection extends SimpleProjection {

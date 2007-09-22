@@ -10,7 +10,7 @@ import javax.persistence.EntityNotFoundException;
  * @param <T> object's type, it must implements at least <code>IEntity</code>
  * @param <I> primary key's type
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public interface IDao<T extends IEntity<I>, I extends Serializable> {

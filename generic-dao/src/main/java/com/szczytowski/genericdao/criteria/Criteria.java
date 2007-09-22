@@ -13,20 +13,35 @@ import javax.persistence.NonUniqueResultException;
 /**
  * Critera used to build EQL queries.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public class Criteria {
 
+    /**
+     * Join types which can be used to <code>addAlias</code> and <code>createCriteria</code> methods.
+     */ 
     public enum JoinType {
 
-        INNER_JOIN("inner join"), LEFT_JOIN("left outer join");
+        /**
+         * Inner join. Default one.
+         */ 
+        INNER_JOIN("inner join"), 
+        
+        /**
+         * Left outer join.
+         */ 
+        LEFT_JOIN("left outer join");
+        
         private String sql;
-
+        
         private JoinType(String sql) {
             this.sql = sql;
         }
 
+        /**
+         * Generate EQL version of given join.
+         */ 
         public String toSqlString() {
             return sql;
         }
@@ -57,7 +72,7 @@ public class Criteria {
 
     /**
      * Create new criteria for specified <code>IEntity</code> implementation.
-     * @see IEntity
+     * @see com.szczytowski.genericdao.api.IEntity
      */
     public final static Criteria forClass(Class entity) {
         return new Criteria(getEntityName(entity), "this", null, null);
@@ -113,7 +128,7 @@ public class Criteria {
      * @param projection projection used in query
      * @return criteria object
      * @see Projection
-     * @see Projections
+     * @see com.szczytowski.genericdao.criteria.projection.Projections
      */
     public Criteria setProjection(Projection projection) {
         this.projection = projection;
@@ -306,8 +321,6 @@ public class Criteria {
         if (orderSql.length() > 1) {
             sql += "order by " + orderSql + " ";
         }
-
-        System.out.println("### " + sql);
 
         return sql.trim();
     }

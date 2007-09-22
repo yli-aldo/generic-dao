@@ -21,7 +21,6 @@ import com.szczytowski.genericdao.api.IHiddenable;
 import com.szczytowski.genericdao.api.IInheritable;
 import com.szczytowski.genericdao.criteria.Criteria;
 import com.szczytowski.genericdao.criteria.restriction.Restrictions;
-import javax.persistence.Query;
 
 /**
  * Abstract implementation of generic DAO.
@@ -29,7 +28,7 @@ import javax.persistence.Query;
  * @param <T> entity type, it must implements at least <code>IEntity</code>
  * @param <I> entity's primary key, it must be serializable
  * @see IEntity
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public class GenericDao<T extends IEntity<I>, I extends Serializable> implements IDao<T, I> {
@@ -297,7 +296,7 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
      *
      * @param criteria criteria which will be executed
      * @return list of founded objects
-     * @see Query#getResultList()
+     * @see javax.persistence.Query#getResultList()
      */
     @SuppressWarnings(value = "unchecked")
     protected final List findByCriteria(Criteria criteria) {
@@ -311,7 +310,7 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
      * @return retrieved object
      * @throws NoResultException - if there is no result
      * @throws NonUniqueResultException - if more than one result
-     * @see Query#getSingleResult()
+     * @see javax.persistence.Query#getSingleResult()
      */
     protected final Object findUniqueByCriteria(Criteria criteria) throws NonUniqueResultException, NoResultException {
         return criteria.uniqueResult(entityManager);

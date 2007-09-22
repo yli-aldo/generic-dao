@@ -105,7 +105,7 @@
 				<executions>
 					<execution>
 						<id>source packaging</id>
-						<phase>install</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -118,18 +118,12 @@
 				<executions>
 					<execution>
 						<id>javadoc packaging</id>
-						<phase>install</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<wtpversion>1.0</wtpversion>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -185,9 +179,6 @@
 				<role>developer</role>
 			</roles>
 			<timezone>+1</timezone>
-			<properties>
-				<skype>mszczytowski</skype>
-			</properties>
 		</developer>
 	</developers>
 	
@@ -198,7 +189,7 @@
 	
 	<scm>
 		<connection>
-			scm:svn:https://generic-dao.googlecode.com/svn/trunk/
+			scm:svn:http://generic-dao.googlecode.com/svn/trunk/
 		</connection>
 		<developerConnection>
 			scm:svn:https://generic-dao.googlecode.com/svn/trunk/
@@ -207,7 +198,7 @@
 		<url>https://generic-dao.googlecode.com/svn/trunk/</url>
 	</scm>
 
-	<pluginRepositories>
+	<!-- pluginRepositories>
 		<pluginRepository>
 			<id>junit4-test-plugin</id>
 			<url>
@@ -222,6 +213,6 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</pluginRepository>
-	</pluginRepositories>
+	</pluginRepositories -->
 	
 </project>

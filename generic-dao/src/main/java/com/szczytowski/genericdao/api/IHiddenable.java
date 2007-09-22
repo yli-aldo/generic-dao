@@ -4,7 +4,7 @@ package com.szczytowski.genericdao.api;
  * Interface marks class which cannot be deleted. If someone calls one of DAO's delete
  * methods object will be hidden instead of deleted.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public interface IHiddenable {

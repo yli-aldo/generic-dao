@@ -3,7 +3,7 @@ package com.szczytowski.genericdao.criteria.restriction;
 /**
  * Not empty expression.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 import com.szczytowski.genericdao.criteria.Criterion;
