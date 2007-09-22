@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import com.szczytowski.genericdao.api.IEntity;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.NoResultException;
@@ -60,7 +59,7 @@ public class Criteria {
      * Create new criteria for specified <code>IEntity</code> implementation.
      * @see IEntity
      */
-    public static Criteria forClass(Class<? extends IEntity> entity) {
+    public final static Criteria forClass(Class entity) {
         return new Criteria(getEntityName(entity), "this", null, null);
     }
 
@@ -247,11 +246,11 @@ public class Criteria {
         return result;
     }
 
-    protected String createAlias(String name) {
+    protected final String createAlias(String name) {
         return name + "_" + aliasNumber++;
     }
 
-    private String prepateEql(CriteriaQuery criteriaQuery) {
+    private final String prepateEql(CriteriaQuery criteriaQuery) {
         String sql = "from " + name + " as " + alias + " ";
         criteriaQuery.registerAlias(alias);
 
@@ -313,7 +312,7 @@ public class Criteria {
         return sql.trim();
     }
 
-    private Query prepareQuery(EntityManager entityManager) {
+    private final Query prepareQuery(EntityManager entityManager) {
         CriteriaQuery criteriaQuery = new CriteriaQuery();
 
         String sql = prepateEql(criteriaQuery);
@@ -337,8 +336,9 @@ public class Criteria {
         return query;
     }
 
-    private static String getEntityName(Class<? extends IEntity> type) {
-        Entity entity = type.getAnnotation(Entity.class);
+    @SuppressWarnings("unchecked")
+    private final static String getEntityName(Class type) {        
+        Entity entity = (Entity)type.getAnnotation(Entity.class);
 
         if (entity == null || entity.name() == null || entity.name().length() == 0) {
             return type.getSimpleName();
@@ -350,7 +350,7 @@ public class Criteria {
     /**
      * Information about current query, for example parameters.
      */
-    public class CriteriaQuery {
+    public final class CriteriaQuery {
 
         private List<Object> params = new ArrayList<Object>();
 
@@ -411,7 +411,7 @@ public class Criteria {
     /**
      * Subcritera associated with root criteria.
      */
-    public class Subcriteria extends Criteria {
+    public final class Subcriteria extends Criteria {
 
         private Subcriteria(String name, String alias, JoinType joinType, Criteria parent) {
             super(name, alias, joinType, parent);
@@ -485,7 +485,7 @@ public class Criteria {
     /**
      * Criteria entry.
      */
-    private class CriterionEntry {
+    private final class CriterionEntry {
 
         private final Criterion criterion;
 
@@ -508,7 +508,7 @@ public class Criteria {
     /**
      * Order entry
      */
-    private class OrderEntry {
+    private final class OrderEntry {
 
         private final Order order;
 
