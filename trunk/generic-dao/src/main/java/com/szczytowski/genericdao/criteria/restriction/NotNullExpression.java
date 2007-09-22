@@ -6,7 +6,7 @@ import com.szczytowski.genericdao.criteria.Criterion;
 /**
  * Not null expression.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public class NotNullExpression implements Criterion {

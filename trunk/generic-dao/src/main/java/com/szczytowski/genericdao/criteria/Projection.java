@@ -3,7 +3,7 @@ package com.szczytowski.genericdao.criteria;
 /**
  * Projection used for manipulating select and group by clauses.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public interface Projection {

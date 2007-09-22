@@ -6,7 +6,7 @@ package com.szczytowski.genericdao.api;
  *
  * @param <T> parent's type, must be the same as child's type
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public interface IInheritable<T> {

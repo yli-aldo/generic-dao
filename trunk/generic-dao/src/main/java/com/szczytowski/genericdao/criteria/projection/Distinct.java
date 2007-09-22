@@ -6,7 +6,7 @@ import com.szczytowski.genericdao.criteria.Projection;
 /**
  * Distinct projection.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public class Distinct implements Projection {

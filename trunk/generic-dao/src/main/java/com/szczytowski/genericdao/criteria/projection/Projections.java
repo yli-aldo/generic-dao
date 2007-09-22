@@ -5,7 +5,7 @@ import com.szczytowski.genericdao.criteria.Projection;
 /**
  * Projections builder.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public final class Projections {

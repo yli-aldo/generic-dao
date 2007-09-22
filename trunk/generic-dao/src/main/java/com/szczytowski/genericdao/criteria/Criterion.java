@@ -3,7 +3,7 @@ package com.szczytowski.genericdao.criteria;
 /**
  * Criterion used for manipulating where clauses.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public interface Criterion {

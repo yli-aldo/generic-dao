@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @param <I> type of primary key, it must be serializable
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public interface IEntity<I extends Serializable> extends Serializable {

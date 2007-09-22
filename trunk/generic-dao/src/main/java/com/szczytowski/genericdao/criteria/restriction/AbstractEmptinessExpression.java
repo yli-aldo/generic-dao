@@ -6,7 +6,7 @@ import com.szczytowski.genericdao.criteria.Criterion;
 /**
  * Abstract emptiness expression.
  *
- * @author Maciej Szczytowsko <mszczytowski-genericdao@gmail.com>
+ * @author Maciej Szczytowski <mszczytowski-genericdao@gmail.com>
  * @since 1.0
  */
 public abstract class AbstractEmptinessExpression implements Criterion {
