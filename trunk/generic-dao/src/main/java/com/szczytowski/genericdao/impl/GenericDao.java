@@ -72,13 +72,13 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
      * @param entityManager entity manager
      */
     @PersistenceContext
-    public void setEntityManager(EntityManager entityManager) {
+    public final void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @SuppressWarnings(value = "unchecked")
     @Override
-    public T load(I id) throws EntityNotFoundException {
+    public final T load(I id) throws EntityNotFoundException {
         T entity = get(id);
         if (entity == null) {
             throw new EntityNotFoundException("entity " + clazz + "#" + id + " was not found");
@@ -88,19 +88,19 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
 
     @SuppressWarnings(value = "unchecked")
     @Override
-    public T get(I id) {
+    public final T get(I id) {
         return (T) entityManager.find(clazz, id);
     }
 
     @SuppressWarnings(value = "unchecked")
     @Override
-    public List<T> get(I... ids) {
+    public final List<T> get(I... ids) {
         return findByCriteria(Criteria.forClass(clazz).add(Restrictions.in(IEntity.P_ID, ids)));
     }
 
     @SuppressWarnings(value = "unchecked")
     @Override
-    public List<T> get(IInheritable<T> parent) {
+    public final List<T> get(IInheritable<T> parent) {
         if (parent == null) {
             return findByCriteria(Criteria.forClass(clazz).add(Restrictions.isNull(IInheritable.P_PARENT)));
         } else {
@@ -110,13 +110,13 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
 
     @SuppressWarnings(value = "unchecked")
     @Override
-    public List<T> getAll() {
+    public final List<T> getAll() {
         return findByCriteria(Criteria.forClass(clazz));
     }
 
     @SuppressWarnings(value = "unchecked")
     @Override
-    public List<T> findByExample(T example) {
+    public final List<T> findByExample(T example) {
         Criteria criteria = Criteria.forClass(clazz);
 
         Field[] fields = example.getClass().getDeclaredFields();
@@ -169,7 +169,7 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
 
     @SuppressWarnings(value = "unchecked")
     @Override
-    public void setAsDefault(IDefaultable object) {
+    public final void setAsDefault(IDefaultable object) {
         if (object.getExample() != null) {
             List<T> objects = findByExample((T) object.getExample());
             for (T o : objects) {
@@ -189,7 +189,7 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
     }
 
     @Override
-    public void save(final T object) {
+    public final void save(final T object) {
         if (object.getId() != null) {
             entityManager.merge(object);
         } else {
@@ -198,7 +198,7 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
     }
 
     @Override
-    public void save(final T... objects) {
+    public final void save(final T... objects) {
         for (T object : objects) {
             if (object.getId() != null) {
                 entityManager.merge(object);
@@ -209,17 +209,17 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
     }
 
     @Override
-    public void delete(final I id) throws UnsupportedOperationException {
+    public final void delete(final I id) throws UnsupportedOperationException {
         delete(load(id));
     }
 
     @Override
-    public void delete(final I... ids) throws UnsupportedOperationException {
+    public final void delete(final I... ids) throws UnsupportedOperationException {
         deleteAll(get(ids), true);
     }
 
     @Override
-    public void delete(final T object) throws UnsupportedOperationException {
+    public final void delete(final T object) throws UnsupportedOperationException {
         if (isDefaultable) {
             checkIfDefault(object);
         }
@@ -232,16 +232,16 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
     }
 
     @Override
-    public void delete(final T... objects) throws UnsupportedOperationException {
+    public final void delete(final T... objects) throws UnsupportedOperationException {
         deleteAll(Arrays.asList(objects), true);
     }
 
     @Override
-    public void deleteAll() throws UnsupportedOperationException {
+    public final void deleteAll() throws UnsupportedOperationException {
         deleteAll(getAll(), false);
     }
 
-    private void deleteAll(final Collection<T> objects, boolean checkIdDefault) throws UnsupportedOperationException {
+    private final void deleteAll(final Collection<T> objects, boolean checkIdDefault) throws UnsupportedOperationException {
         if (checkIdDefault) {
             if (isDefaultable) {
                 for (T object : objects) {
@@ -261,13 +261,13 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
         }
     }
 
-    private void checkIfDefault(T entity) {
+    private final void checkIfDefault(T entity) {
         if (((IDefaultable) entity).isDefault()) {
             throw new UnsupportedOperationException("can't delete default entity " + clazz + "#" + entity.getId());
         }
     }
 
-    private void checkGenericClass() {
+    private final void checkGenericClass() {
         for (Class i : clazz.getInterfaces()) {
             if (i == IDefaultable.class) {
                 isDefaultable = true;
@@ -282,12 +282,12 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
     }
 
     @Override
-    public void refresh(final T entity) {
+    public final void refresh(final T entity) {
         entityManager.refresh(entity);
     }
 
     @Override
-    public void flushAndClear() {
+    public final void flushAndClear() {
         entityManager.flush();
         entityManager.clear();
     }
@@ -300,7 +300,7 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
      * @see Query#getResultList()
      */
     @SuppressWarnings(value = "unchecked")
-    protected List findByCriteria(Criteria criteria) {
+    protected final List findByCriteria(Criteria criteria) {
         return criteria.list(entityManager);
     }
 
@@ -313,27 +313,27 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
      * @throws NonUniqueResultException - if more than one result
      * @see Query#getSingleResult()
      */
-    protected Object findUniqueByCriteria(Criteria criteria) throws NonUniqueResultException, NoResultException {
+    protected final Object findUniqueByCriteria(Criteria criteria) throws NonUniqueResultException, NoResultException {
         return criteria.uniqueResult(entityManager);
     }
     
     @Override
-    public boolean isActivable() {
+    public final boolean isActivable() {
         return isActivable;
     }
 
     @Override
-    public boolean isDefaultable() {
+    public final boolean isDefaultable() {
         return isDefaultable;
     }
 
     @Override
-    public boolean isHiddenable() {
+    public final boolean isHiddenable() {
         return isHiddenable;
     }
 
     @Override
-    public boolean isInheritable() {
+    public final boolean isInheritable() {
         return isInheritable;
     }
 
@@ -342,7 +342,7 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
      *
      * @return entity manager
      */
-    protected EntityManager getEntityManager() {
+    protected final EntityManager getEntityManager() {
         return entityManager;
     }
 }
