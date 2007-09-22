@@ -56,7 +56,7 @@ public class Restrictions {
      * @return "like" expression
      */
     public static Criterion like(String property, Object value) {
-        return new LikeExpression(property, value);
+        return new LikeExpression(property, value, null, false);
     }
 
     /**
@@ -67,7 +67,7 @@ public class Restrictions {
      * @return "ilike" expression
      */
     public static Criterion ilike(String property, Object value) {
-        return new IlikeExpression(property, value);
+        return new LikeExpression(property, value, null, true);
     }
 
     /**
@@ -311,7 +311,7 @@ public class Restrictions {
      * @param size size
      * @return size "equal" expression
      */
-    public static Criterion sizeEq(String property, int size) {
+    public static Criterion sizeEq(String property, long size) {
         return new SizeExpression(property, size, "=");
     }
 
@@ -322,7 +322,7 @@ public class Restrictions {
      * @param size size
      * @return size "not equal" expression
      */
-    public static Criterion sizeNe(String property, int size) {
+    public static Criterion sizeNe(String property, long size) {
         return new SizeExpression(property, size, "<>");
     }
 
@@ -333,7 +333,7 @@ public class Restrictions {
      * @param size size
      * @return size "less than" expression
      */
-    public static Criterion sizeGt(String property, int size) {
+    public static Criterion sizeGt(String property, long size) {
         return new SizeExpression(property, size, "<");
     }
 
@@ -344,7 +344,7 @@ public class Restrictions {
      * @param size size
      * @return size "greater than" expression
      */
-    public static Criterion sizeLt(String property, int size) {
+    public static Criterion sizeLt(String property, long size) {
         return new SizeExpression(property, size, ">");
     }
 
@@ -355,7 +355,7 @@ public class Restrictions {
      * @param size size
      * @return size "less than or equal" expression
      */
-    public static Criterion sizeGe(String property, int size) {
+    public static Criterion sizeGe(String property, long size) {
         return new SizeExpression(property, size, "<=");
     }
 
@@ -366,7 +366,7 @@ public class Restrictions {
      * @param size size
      * @return size "greater than or equal" expression
      */
-    public static Criterion sizeLe(String property, int size) {
+    public static Criterion sizeLe(String property, long size) {
         return new SizeExpression(property, size, ">=");
     }
 

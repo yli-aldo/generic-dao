@@ -41,7 +41,7 @@ public class Junction implements Criterion {
         if (criteria.size() == 0) {
             return "1=1";
         }
-        String sql = ")";
+        String sql = "(";
 
         for (Criterion criterion : criteria) {
             if (sql.length() > 1) {

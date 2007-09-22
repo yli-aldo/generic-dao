@@ -2,6 +2,7 @@ package com.szczytowski.genericdao.test.criteria;
 
 import com.szczytowski.genericdao.api.IEntity;
 import com.szczytowski.genericdao.criteria.Criteria;
+import com.szczytowski.genericdao.criteria.Criterion;
 import com.szczytowski.genericdao.criteria.Order;
 import com.szczytowski.genericdao.criteria.Projection;
 import com.szczytowski.genericdao.criteria.projection.Projections;
@@ -9,7 +10,10 @@ import com.szczytowski.genericdao.criteria.restriction.Restrictions;
 import com.szczytowski.genericdao.test.AbstractTest;
 import com.szczytowski.genericdao.test.ComplexEntityImpl;
 import com.szczytowski.genericdao.test.SimpleEntityImpl;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import junit.framework.Assert;
 
 /**
@@ -31,24 +35,6 @@ public class CriteriaTest extends AbstractTest {
         if(expectedValue != null) {
             Assert.assertEquals(expectedValue, result);
         }
-    }
-    
-    private void testProjection(Projection projection, Class[] expectedClasses, Object[] expectedValues) {
-        Object result = getSimpleDao().getByCriteria(Criteria.forClass(SimpleEntityImpl.class).setProjection(projection)).get(0);
-        
-        Assert.assertTrue(result instanceof Object[]);
-        
-        Object[] results = (Object[])result;
-        
-        Assert.assertEquals(expectedClasses.length, results.length);
-        
-        for(int i = 0; i < results.length; i++) {       
-            Assert.assertEquals(expectedClasses[i], results[i].getClass());
-            
-            if(expectedValues[i] != null) {
-               Assert.assertEquals(expectedValues[i], results[i]);
-            }                       
-        }        
     }
     
     public void testOrderBy() {
@@ -248,5 +234,139 @@ public class CriteriaTest extends AbstractTest {
         
         Assert.assertEquals(Long.class, result4.getClass());        
         Assert.assertEquals(e8.getId(), result4);      
+    }
+    
+    public void testRestrictions() {
+        SimpleEntityImpl e1 = getSimpleEntity("abc", 1);
+        SimpleEntityImpl e2 = getSimpleEntity("def", 2);
+        SimpleEntityImpl e3 = getSimpleEntity("ghi", 3);
+        
+        getSimpleDao().save(e1);
+        getSimpleDao().save(e2);
+        getSimpleDao().save(e3);
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.idEq(e1.getId()), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.idEq(e2.getId()), e2);
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.eq(SimpleEntityImpl.P_INT, 2), e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.ge(SimpleEntityImpl.P_INT, 2), e2, e3);
+        testRestriction(SimpleEntityImpl.class, Restrictions.gt(SimpleEntityImpl.P_INT, 2), e3);
+        testRestriction(SimpleEntityImpl.class, Restrictions.le(SimpleEntityImpl.P_INT, 2), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.lt(SimpleEntityImpl.P_INT, 2), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.ne(SimpleEntityImpl.P_INT, 2), e1, e3);
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.between(SimpleEntityImpl.P_INT, 1, 3), e1, e2, e3);
+        testRestriction(SimpleEntityImpl.class, Restrictions.between(SimpleEntityImpl.P_INT, 2, 3), e2, e3);
+        testRestriction(SimpleEntityImpl.class, Restrictions.between(SimpleEntityImpl.P_INT, 1, 2), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.between(SimpleEntityImpl.P_INT, 2, 2), e2);
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.ilike(SimpleEntityImpl.P_PROP, "abc"), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.ilike(SimpleEntityImpl.P_PROP, "AbC"), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.ilike(SimpleEntityImpl.P_PROP, "aBc"), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.ilike(SimpleEntityImpl.P_PROP, "%B%"), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.like(SimpleEntityImpl.P_PROP, "abc"), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.like(SimpleEntityImpl.P_PROP, "abC"));
+        testRestriction(SimpleEntityImpl.class, Restrictions.like(SimpleEntityImpl.P_PROP, "ab%"), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.like(SimpleEntityImpl.P_PROP, "a%"), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.like(SimpleEntityImpl.P_PROP, "ab_"), e1);
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.in(SimpleEntityImpl.P_INT, new Integer[] { 1, 2 }), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.in(SimpleEntityImpl.P_INT, Arrays.asList(new Integer[] { 1, 2 })), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.in(SimpleEntityImpl.P_INT, new Integer[] { 0, 1, 2, 4 }), e1, e2);
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.or(Restrictions.eq(SimpleEntityImpl.P_INT, 1), Restrictions.eq(SimpleEntityImpl.P_INT, 2)), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.or(Restrictions.eq(SimpleEntityImpl.P_INT, 1), Restrictions.eq(SimpleEntityImpl.P_PROP, "def")), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.and(Restrictions.eq(SimpleEntityImpl.P_INT, 1), Restrictions.eq(SimpleEntityImpl.P_INT, 2)));
+        testRestriction(SimpleEntityImpl.class, Restrictions.and(Restrictions.eq(SimpleEntityImpl.P_INT, 1), Restrictions.eq(SimpleEntityImpl.P_PROP, "abc")), e1);
+        
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put(SimpleEntityImpl.P_INT, 1);
+        map.put(SimpleEntityImpl.P_PROP, "abc");
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.allEq(map), e1);
+        
+        map.put(SimpleEntityImpl.P_PROP, "def");
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.allEq(map));
+
+        testRestriction(SimpleEntityImpl.class, Restrictions.not(Restrictions.eq(SimpleEntityImpl.P_INT, 2)), e1, e3);
+        
+        SimpleEntityImpl e4 = getSimpleEntity(null, null);
+        
+        getSimpleDao().save(e4);
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.isNull(SimpleEntityImpl.P_INT), e4);
+        testRestriction(SimpleEntityImpl.class, Restrictions.isNull(SimpleEntityImpl.P_PROP), e4);
+        testRestriction(SimpleEntityImpl.class, Restrictions.isNotNull(SimpleEntityImpl.P_INT), e1, e2, e3);
+        testRestriction(SimpleEntityImpl.class, Restrictions.isNotNull(SimpleEntityImpl.P_PROP), e1, e2, e3);
+                
+        ComplexEntityImpl e5 = getComplexEntity("abc", true, true, false, null, e1);
+        ComplexEntityImpl e6 = getComplexEntity("abb", true, true, false, null, e1);
+        ComplexEntityImpl e7 = getComplexEntity("abd", true, true, false, null, e1);
+        ComplexEntityImpl e8 = getComplexEntity("foo", true, true, false, null, e2);
+        ComplexEntityImpl e9 = getComplexEntity("goo", true, true, false, null, e2);
+        ComplexEntityImpl e10 = getComplexEntity("hoo", true, true, false, null, e4);
+        
+        getComplexDao().save(e5);
+        getComplexDao().save(e6);
+        getComplexDao().save(e7);
+        getComplexDao().save(e8);
+        getComplexDao().save(e9);
+        getComplexDao().save(e10);
+        
+        testRestriction(ComplexEntityImpl.class, Restrictions.eqProperty(ComplexEntityImpl.P_PROP, ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_PROP), e5);
+        testRestriction(ComplexEntityImpl.class, Restrictions.geProperty(ComplexEntityImpl.P_PROP, ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_PROP), e5, e7, e8, e9);
+        testRestriction(ComplexEntityImpl.class, Restrictions.gtProperty(ComplexEntityImpl.P_PROP, ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_PROP), e7, e8, e9);
+        testRestriction(ComplexEntityImpl.class, Restrictions.leProperty(ComplexEntityImpl.P_PROP, ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_PROP), e5, e6);
+        testRestriction(ComplexEntityImpl.class, Restrictions.ltProperty(ComplexEntityImpl.P_PROP, ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_PROP), e6);
+        testRestriction(ComplexEntityImpl.class, Restrictions.neProperty(ComplexEntityImpl.P_PROP, ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_PROP), e6, e7, e8, e9);
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.isEmpty(SimpleEntityImpl.P_ENTITIES), e3);
+        testRestriction(SimpleEntityImpl.class, Restrictions.isNotEmpty(SimpleEntityImpl.P_ENTITIES), e1, e2, e4);
+        
+        testRestriction(SimpleEntityImpl.class, Restrictions.sizeEq(SimpleEntityImpl.P_ENTITIES, 2L), e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.sizeGe(SimpleEntityImpl.P_ENTITIES, 2L), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.sizeGt(SimpleEntityImpl.P_ENTITIES, 2L), e1);
+        testRestriction(SimpleEntityImpl.class, Restrictions.sizeLe(SimpleEntityImpl.P_ENTITIES, 2L), e2, e3, e4);
+        testRestriction(SimpleEntityImpl.class, Restrictions.sizeNe(SimpleEntityImpl.P_ENTITIES, 2L), e1, e3, e4);
+                      
+        testRestriction(ComplexEntityImpl.class, Restrictions.conjunction().add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abb")).add(Restrictions.eq(ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_PROP, "abc")).add(Restrictions.eq(ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_INT, 1)), e6);
+        testRestriction(ComplexEntityImpl.class, Restrictions.disjunction().add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abb")).add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abc")).add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abd")), e5, e6, e7);
+                
+        testRestriction(ComplexEntityImpl.class, Restrictions.conjunction().add(Restrictions.disjunction().add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abb")).add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abc")).add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abd"))).add(Restrictions.eq(ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_PROP, "abc")).add(Restrictions.eq(ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_INT, 1)), e5, e6, e7);
+    }
+    
+    private void testRestriction(Class entityClass, Criterion criterion, IEntity... expectedEntities) {
+        List<IEntity> results = null;
+        
+        if(entityClass == SimpleEntityImpl.class) {
+            results = getSimpleDao().getByCriteria(Criteria.forClass(SimpleEntityImpl.class).add(criterion).addOrder(Order.asc(IEntity.P_ID)));
+        } else {
+            results = getSimpleDao().getByCriteria(Criteria.forClass(ComplexEntityImpl.class).add(criterion).addOrder(Order.asc(IEntity.P_ID)));
+        }
+        
+        Assert.assertEquals(expectedEntities.length, results.size());
+        
+        for(int i = 0; i < expectedEntities.length; i++) {       
+            Assert.assertEquals(expectedEntities[i].getId(), results.get(i).getId());           
+        }
+    }
+    
+    private void testProjection(Projection projection, Class[] expectedClasses, Object[] expectedValues) {
+        Object result = getSimpleDao().getByCriteria(Criteria.forClass(SimpleEntityImpl.class).setProjection(projection)).get(0);
+        
+        Assert.assertTrue(result instanceof Object[]);
+        
+        Object[] results = (Object[])result;
+        
+        Assert.assertEquals(expectedClasses.length, results.length);
+        
+        for(int i = 0; i < results.length; i++) {       
+            Assert.assertEquals(expectedClasses[i], results[i].getClass());
+            
+            if(expectedValues[i] != null) {
+               Assert.assertEquals(expectedValues[i], results[i]);
+            }                       
+        }        
     }
 }

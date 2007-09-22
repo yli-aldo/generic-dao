@@ -12,7 +12,7 @@ import com.szczytowski.genericdao.criteria.Criterion;
 public class SizeExpression implements Criterion {
 
     private final String property;
-    private final int size;
+    private final long size;
     private final String operator;
 
     /**
@@ -22,7 +22,7 @@ public class SizeExpression implements Criterion {
      * @param size size
      * @param operator operator
      */
-    protected SizeExpression(String property, int size, String operator) {
+    protected SizeExpression(String property, long size, String operator) {
         this.property = property;
         this.size = size;
         this.operator = operator;
