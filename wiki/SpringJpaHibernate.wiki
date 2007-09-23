@@ -1,20 +1,16 @@
 #labels Featured,Phase-Deploy
-#Example of using generic-dao with Spring Framework, JPA and Hibernate
-
-= Introduction =
-
 This example shows how to use generic-dao with Spring Framework and Hibernate.
 
 Things that you need:
-* JPA configuration (persistance.xml)
-* database configuration (db.properties)
-* application context
-* entity class
-* dao class
+ * JPA configuration (persistance.xml)
+ * database configuration (db.properties)
+ * application context
+ * entity class
+ * dao class
 
 = JPA configuration =
 
-First, we create JPA configuration (persistance.xml). In this sample I've used HSQL in-memory database and `your.domain.YourEntityClass` class, which we will create later.
+First, we will create JPA configuration (persistance.xml). In this sample I've used HSQL in-memory database and `your.domain.YourEntityClass` class, which we will create later.
 
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
@@ -44,7 +40,7 @@ First, we create JPA configuration (persistance.xml). In this sample I've used H
 
 = Database configuration =
 
-Next, we make `db.properties` file, which contains database related configuration.
+Next, we will make `db.properties` file, which contains database related configuration.
 
 {{{
 db.driver=org.hsqldb.jdbcDriver
@@ -55,7 +51,7 @@ db.password=
  
 = Application context =
 
-Third step. In file `applicationContext.xml` we create Spring application configuration.
+In third step in file `applicationContext.xml` we will create Spring application configuration.
 
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
@@ -110,6 +106,8 @@ Creating annotated transaction manager. Read more about `@Transaction` annotatio
     <tx:annotation-driven transaction-manager="transactionManager" />
 }}}
 
+Creating annotation for injection EntityManagerFactory and EntityManager.
+
 {{{
     <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
 }}}    
@@ -125,6 +123,58 @@ And that's all :)
 {{{    
 </beans>
 }}} 
+
+
+= Entity class =
+
+Now we will create entity class.
+
+{{{
+@Entity
+@Table(name = "your_entity")
+public class YourEntityClass implements IEntity<Long> {
  
+    @Id
+    @SequenceGenerator(name = "gen_test_entity2_id", sequenceName = "test_entity2_id_seq", allocationSize = 10)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen_test_entity2_id")
+    private Long id;
+
+    @Column(name = "name", nullable = false, length = 64)
+    private String name;
+
+    /*
+     * Create constructors, getters, setters, isEquals, hashcode, etc.
+     */
+}
+}}} 
+ 
+= Dao =
+
+In last step we will create dao.
+
+{{{
+public interface YourDaoInterface extends IDao<YourEntityClass, Long> {
+
+    YourEntityClass getByName(String name);
+}
+}}}
+
+
+{{{
+public class YourDaoClass extends GenericDao<YourEntityClass, Long> implements YourDaoInterface {
+
+    public YourEntityClass getByName(String name) {
+        List<YourEntityClass> list = findByCriteria(Criteria.forClass(YourEntityClass.class).add(Restrictions.eq("name", name)));		
+
+        if(list == null || list.size() != 1) {
+            return null;
+        }
+
+        return list.get(0);
+    }
+}
+}}}
+
+
  
  
