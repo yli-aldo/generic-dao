@@ -8,6 +8,16 @@ Things that you need:
  * entity class
  * dao class
 
+JARs that you need:
+ * genericdao-1.0.jar
+ * persistence-api-1.0.jar
+ * spring-2.0.6.jar
+ * hibernate-3.2.2.ga
+ * hibernate-entitymanager-3.2.1.ga
+ * hibernate-annotations-3.2.1.ga
+ * hsqldb-1.8.0.7
+ * commons-lang-2.3
+		
 = JPA configuration =
 
 First, we will create JPA configuration (persistance.xml). In this sample I've used HSQL in-memory database and `your.domain.YourEntityClass` class, which we will create later.
@@ -176,5 +186,6 @@ public class YourDaoClass extends GenericDao<YourEntityClass, Long> implements Y
 }}}
 
 
+ 
  
  
