@@ -335,6 +335,60 @@ public class CriteriaTest extends AbstractTest {
                 
         testRestriction(ComplexEntityImpl.class, Restrictions.conjunction().add(Restrictions.disjunction().add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abb")).add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abc")).add(Restrictions.eq(ComplexEntityImpl.P_PROP, "abd"))).add(Restrictions.eq(ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_PROP, "abc")).add(Restrictions.eq(ComplexEntityImpl.P_ENTITY + "." + SimpleEntityImpl.P_INT, 1)), e5, e6, e7);
     }
+
+    public void testAlias() {
+        SimpleEntityImpl e1 = getSimpleEntity("abc", 1);
+        
+        getSimpleDao().save(e1);
+
+        ComplexEntityImpl e2 = getComplexEntity("def", true, true, false, null, e1);
+        
+        getComplexDao().save(e2);
+
+        List<IEntity> results = getComplexDao().getByCriteria(Criteria.forClass(ComplexEntityImpl.class).createAlias(ComplexEntityImpl.P_ENTITY, "aentity").add(Restrictions.eq("aentity." + SimpleEntityImpl.P_PROP, "abc")));
+
+        Assert.assertEquals(1L, results.size());
+        Assert.assertEquals(e2.getId(), results.get(0).getId());
+
+        results = getComplexDao().getByCriteria(Criteria.forClass(ComplexEntityImpl.class).createAlias(ComplexEntityImpl.P_ENTITY, "aentity", Criteria.JoinType.LEFT_JOIN).add(Restrictions.eq("aentity." + SimpleEntityImpl.P_PROP, "abc")));
+
+        Assert.assertEquals(1L, results.size());
+        Assert.assertEquals(e2.getId(), results.get(0).getId());
+
+        Criteria criteria = Criteria.forClass(ComplexEntityImpl.class);
+        criteria.createCriteria(ComplexEntityImpl.P_ENTITY).add(Restrictions.eq(SimpleEntityImpl.P_PROP, "abc"));
+
+        results = getComplexDao().getByCriteria(criteria);
+
+        Assert.assertEquals(1L, results.size());
+        Assert.assertEquals(e2.getId(), results.get(0).getId());
+
+        criteria = Criteria.forClass(ComplexEntityImpl.class);
+        criteria.createCriteria(ComplexEntityImpl.P_ENTITY, Criteria.JoinType.LEFT_JOIN).add(Restrictions.eq(SimpleEntityImpl.P_PROP, "abc"));
+
+        results = getComplexDao().getByCriteria(criteria);
+
+        Assert.assertEquals(1L, results.size());
+        Assert.assertEquals(e2.getId(), results.get(0).getId());
+
+        ComplexEntityImpl e3 = getComplexEntity("ghi", true, true, false, e2, e1);
+        
+        getComplexDao().save(e3);
+
+        results = getComplexDao().getByCriteria(Criteria.forClass(ComplexEntityImpl.class).createAlias(ComplexEntityImpl.P_ENTITY, "aentity").createAlias(ComplexEntityImpl.P_PARENT, "aparent").add(Restrictions.eq("aentity." + SimpleEntityImpl.P_PROP, "abc")).add(Restrictions.eq("aparent." + ComplexEntityImpl.P_PROP, "def")));
+
+        Assert.assertEquals(1L, results.size());
+        Assert.assertEquals(e3.getId(), results.get(0).getId());
+
+        criteria = Criteria.forClass(ComplexEntityImpl.class);
+        criteria.createCriteria(ComplexEntityImpl.P_ENTITY).add(Restrictions.eq(SimpleEntityImpl.P_PROP, "abc"));
+        criteria.createCriteria(ComplexEntityImpl.P_PARENT).add(Restrictions.eq(ComplexEntityImpl.P_PROP, "def"));
+
+        results = getComplexDao().getByCriteria(criteria);
+
+        Assert.assertEquals(1L, results.size());
+        Assert.assertEquals(e3.getId(), results.get(0).getId());
+    }
     
     private void testRestriction(Class entityClass, Criterion criterion, IEntity... expectedEntities) {
         List<IEntity> results = null;
