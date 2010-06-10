@@ -3,6 +3,7 @@ package com.szczytowski.genericdao.impl;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -52,7 +53,16 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
    */
   @SuppressWarnings(value = "unchecked")
   public GenericDao() {
-    clazz = (Class<IEntity<I>>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+
+    Type[] types = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments();
+
+    if (types[0] instanceof ParameterizedType) {
+      // If the class has parameterized types, it takes the raw type.
+      ParameterizedType type = (ParameterizedType) types[0];
+      clazz = (Class<IEntity<I>>) type.getRawType();
+    } else {
+      clazz = (Class<IEntity<I>>) types[0];
+    }
     checkGenericClass();
   }
 
