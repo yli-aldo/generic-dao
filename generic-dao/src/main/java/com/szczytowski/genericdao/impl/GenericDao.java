@@ -14,7 +14,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
-import javax.persistence.PersistenceContext;
 
 import com.szczytowski.genericdao.api.IActivable;
 import com.szczytowski.genericdao.api.IDao;
@@ -83,7 +82,6 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
    * 
    * @param entityManager entity manager
    */
-  @PersistenceContext
   public void setEntityManager(EntityManager entityManager) {
     this.entityManager = entityManager;
   }
