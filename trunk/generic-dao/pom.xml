@@ -188,9 +188,9 @@
 	</issueManagement>
 	
 	<scm>
-		<connection>scm:svn:http://generic-dao.googlecode.com/svn/trunk/</connection>
-		<developerConnection>scm:svn:https://generic-dao.googlecode.com/svn/trunk/</developerConnection>
-		<url>https://generic-dao.googlecode.com/svn/trunk/</url>
+		<connection>scm:svn:http://generic-dao.googlecode.com/svn/trunk/generic-dao/</connection>
+		<developerConnection>scm:svn:https://generic-dao.googlecode.com/svn/trunk/generic-dao/</developerConnection>
+		<url>https://generic-dao.googlecode.com/svn/trunk/generic-dao/</url>
 	</scm>
 
 	<!-- pluginRepositories>
