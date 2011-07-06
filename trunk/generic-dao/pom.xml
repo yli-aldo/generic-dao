@@ -209,14 +209,6 @@
 		<developerConnection>scm:svn:https://generic-dao.googlecode.com/svn/trunk/generic-dao/</developerConnection>
 		<url>https://generic-dao.googlecode.com/svn/trunk/generic-dao/</url>
 	</scm>
-  
-  <distributionManagement>
-   <repository>
-       <uniqueVersion>false</uniqueVersion>
-       <id>googlecode</id>
-       <url>svn:https://generic-dao.googlecode.com/svn</url>
-   </repository>
-  </distributionManagement>
 
 	<!-- pluginRepositories>
 		<pluginRepository>
