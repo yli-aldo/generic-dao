@@ -262,7 +262,7 @@ public class Criteria {
     }
 
     protected final String createAlias(String name) {
-        return name + "_" + aliasNumber++;
+        return name.replaceAll(".", "_") + "_" + aliasNumber++;
     }
 
     private final String prepateEql(CriteriaQuery criteriaQuery) {
