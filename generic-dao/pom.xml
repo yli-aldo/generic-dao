@@ -5,7 +5,7 @@
 	
 	<groupId>com.szczytowski.genericdao</groupId>
 	<artifactId>genericdao</artifactId>	
-	<version>1.2-SNAPSHOT</version>
+	<version>1.1.1</version>
 	<packaging>jar</packaging>
 
 	<name>Generic DAO</name>
@@ -205,9 +205,9 @@
 	</issueManagement>
 	
 	<scm>
-		<connection>scm:svn:http://generic-dao.googlecode.com/svn/trunk/generic-dao/</connection>
-		<developerConnection>scm:svn:https://generic-dao.googlecode.com/svn/trunk/generic-dao/</developerConnection>
-		<url>https://generic-dao.googlecode.com/svn/trunk/generic-dao/</url>
+		<connection>scm:svn:http://generic-dao.googlecode.com/svn/tags/genericdao-1.1.1</connection>
+		<developerConnection>scm:svn:https://generic-dao.googlecode.com/svn/tags/genericdao-1.1.1</developerConnection>
+		<url>https://generic-dao.googlecode.com/svn/tags/genericdao-1.1.1</url>
 	</scm>
   
   <distributionManagement>
