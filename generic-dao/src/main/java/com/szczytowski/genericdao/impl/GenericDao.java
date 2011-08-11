@@ -201,11 +201,12 @@ public class GenericDao<T extends IEntity<I>, I extends Serializable> implements
   }
 
   @Override
-  public void save(final T object) {
+  public T save(final T object) {
     if (object.getId() != null) {
-      entityManager.merge(object);
+      return entityManager.merge(object);
     } else {
       entityManager.persist(object);
+      return object;
     }
   }
 
