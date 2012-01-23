@@ -1,5 +1,13 @@
 package com.szczytowski.genericdao.test.criteria;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import junit.framework.Assert;
+
+import com.szczytowski.genericdao.api.IDao;
 import com.szczytowski.genericdao.api.IEntity;
 import com.szczytowski.genericdao.criteria.Criteria;
 import com.szczytowski.genericdao.criteria.Criterion;
@@ -10,11 +18,6 @@ import com.szczytowski.genericdao.criteria.restriction.Restrictions;
 import com.szczytowski.genericdao.test.AbstractTest;
 import com.szczytowski.genericdao.test.ComplexEntityImpl;
 import com.szczytowski.genericdao.test.SimpleEntityImpl;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import junit.framework.Assert;
 
 /**
  * Abstract unit tests for {@link IDao} class.
@@ -238,7 +241,7 @@ public class CriteriaTest extends AbstractTest {
     
     public void testRestrictions() {
         SimpleEntityImpl e1 = getSimpleEntity("abc", 1);
-        SimpleEntityImpl e2 = getSimpleEntity("def", 2);
+        SimpleEntityImpl e2 = getSimpleEntity("deF", 2);
         SimpleEntityImpl e3 = getSimpleEntity("ghi", 3);
         
         getSimpleDao().save(e1);
@@ -274,8 +277,12 @@ public class CriteriaTest extends AbstractTest {
         testRestriction(SimpleEntityImpl.class, Restrictions.in(SimpleEntityImpl.P_INT, Arrays.asList(new Integer[] { 1, 2 })), e1, e2);
         testRestriction(SimpleEntityImpl.class, Restrictions.in(SimpleEntityImpl.P_INT, new Integer[] { 0, 1, 2, 4 }), e1, e2);
         
+        testRestriction(SimpleEntityImpl.class, Restrictions.iin(SimpleEntityImpl.P_PROP, new String[] { "ABC", "DEf" }), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.iin(SimpleEntityImpl.P_PROP, Arrays.asList(new  String[] { "ABC", "DEf" })), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.iin(SimpleEntityImpl.P_PROP, new String[] { "SOME", "ABC", "DEf" }), e1, e2);
+        
         testRestriction(SimpleEntityImpl.class, Restrictions.or(Restrictions.eq(SimpleEntityImpl.P_INT, 1), Restrictions.eq(SimpleEntityImpl.P_INT, 2)), e1, e2);
-        testRestriction(SimpleEntityImpl.class, Restrictions.or(Restrictions.eq(SimpleEntityImpl.P_INT, 1), Restrictions.eq(SimpleEntityImpl.P_PROP, "def")), e1, e2);
+        testRestriction(SimpleEntityImpl.class, Restrictions.or(Restrictions.eq(SimpleEntityImpl.P_INT, 1), Restrictions.eq(SimpleEntityImpl.P_PROP, "deF")), e1, e2);
         testRestriction(SimpleEntityImpl.class, Restrictions.and(Restrictions.eq(SimpleEntityImpl.P_INT, 1), Restrictions.eq(SimpleEntityImpl.P_INT, 2)));
         testRestriction(SimpleEntityImpl.class, Restrictions.and(Restrictions.eq(SimpleEntityImpl.P_INT, 1), Restrictions.eq(SimpleEntityImpl.P_PROP, "abc")), e1);
         
