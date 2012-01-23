@@ -7,7 +7,7 @@ import com.szczytowski.genericdao.criteria.Criterion;
  * Insensitive In expression.
  * 
  * @author Simon Lavigne-Giroux <simon.lg@gmail.com>
- * @since 1.3
+ * @since 1.1.3
  */
 public class InsensitiveInExpression implements Criterion {
 
